@@ -97,7 +97,9 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
   redirect(safeNextPath(raw.next));
 }
 
-const otpSchema = z.object({ email, token: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code from the email.") });
+// Supabase lets each project set the email OTP length (6–10 digits), so don't hard-code 6.
+const otpToken = z.string().trim().regex(/^\d{6,10}$/, "Enter the code from the email.");
+const otpSchema = z.object({ email, token: otpToken });
 
 /** AUTH-02: verify with the 6-digit code (useful when the link is opened on another device). */
 export async function verifyEmailCode(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -135,8 +137,34 @@ export async function requestPasswordReset(_prev: AuthFormState, formData: FormD
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: `${publicEnv().siteUrl}/auth/callback?next=/reset-password`,
   });
-  if (error?.status === 429) return { error: "Please wait a minute before requesting another email." };
-  return { message: "If an account exists for that email, we've sent a link to reset the password." };
+  // `resend` keeps the form on the code step when a resend fails.
+  const values = { email: parsed.data, ...(formData.get("resend") === "1" ? { resend: "1" } : {}) };
+  // Auth limits both the interval per address (about a minute) and emails per hour across the project.
+  if (error?.status === 429) {
+    return { error: "Too many codes were requested. Use the latest code you received, or wait a few minutes and try again.", values };
+  }
+  if (error) {
+    // Auth returns success for unknown addresses, so an error here is a delivery/config problem (e.g. SMTP), not enumeration.
+    console.error("[password-reset] resetPasswordForEmail failed", error.status, error.code, error.message);
+    return { error: "We couldn't send the code right now. Try again in a few minutes.", values };
+  }
+  // Same response whether or not the address has an account (prevents account enumeration).
+  return { message: values.resend ? "We've sent a new code. Use the latest one." : "Code sent.", values };
+}
+
+/** Password recovery with the one-time code from the reset email. */
+export async function verifyResetCode(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const raw = Object.fromEntries(formData) as Record<string, string>;
+  const parsed = otpSchema.safeParse(raw);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message, values: { email: raw.email ?? "" } };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.verifyOtp({ email: parsed.data.email, token: parsed.data.token, type: "recovery" });
+  if (error || !data.session) {
+    if (error?.status === 429) return { error: "Too many attempts. Wait a few minutes and try again.", values: { email: parsed.data.email } };
+    return { error: "That code is invalid or has expired. Check it, or resend a new code.", values: { email: parsed.data.email } };
+  }
+  redirect("/reset-password");
 }
 
 const resetSchema = z
@@ -148,8 +176,22 @@ export async function updatePassword(_prev: AuthFormState, formData: FormData): 
   if (!parsed.success) return { error: "Check the highlighted fields.", fieldErrors: parsed.error.flatten().fieldErrors };
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims?.claims?.sub) return { error: "Your reset link has expired. Request a new one." };
+  if (!claims?.claims?.sub) return { error: "Your reset session has expired. Request a new code." };
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
-  if (error) return { error: error.code === "same_password" ? "Choose a password you haven't used before." : "Couldn't update the password. Try again." };
+  if (error) {
+    switch (error.code) {
+      case "same_password":
+        return { error: "Choose a password you haven't used before." };
+      case "weak_password":
+        // Supabase's password policy can be stricter than the form's checks; its message lists what's missing.
+        return { error: error.message || "That password is too weak. Try a longer one with mixed characters." };
+      case "session_not_found":
+      case "reauthentication_needed":
+        return { error: "Your reset session has expired. Request a new code." };
+      default:
+        console.error("[password-reset] updateUser failed", error.status, error.code, error.message);
+        return { error: "Couldn't update the password. Try again." };
+    }
+  }
   redirect("/account?password=updated");
 }

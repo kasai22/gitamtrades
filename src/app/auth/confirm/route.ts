@@ -24,5 +24,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
-  return NextResponse.redirect(`${origin}/verify-email?error=link`);
+  // A failed reset link belongs on the reset page, not the sign-up verification page.
+  const failure = type === "recovery" ? "/forgot-password?error=link" : "/verify-email?error=link";
+  return NextResponse.redirect(`${origin}${failure}`);
 }

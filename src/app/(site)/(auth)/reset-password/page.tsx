@@ -11,9 +11,9 @@ export default async function ResetPasswordPage() {
   if (!viewer) {
     return (
       <>
-        <h1 className="text-2xl font-semibold tracking-tight">Reset link expired</h1>
-        <FormMessage className="my-4" error="Open the latest reset email on this device, or request a new link." />
-        <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">Request a new link</Link>
+        <h1 className="text-2xl font-semibold tracking-tight">Reset session expired</h1>
+        <FormMessage className="my-4" error="Verify a reset code first, then choose your new password." />
+        <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">Get a reset code</Link>
       </>
     );
   }

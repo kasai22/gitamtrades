@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { FormField, FormMessage, SubmitButton, describedBy } from "@/components/shared/form";
@@ -12,6 +12,7 @@ import {
   signUp,
   updatePassword,
   verifyEmailCode,
+  verifyResetCode,
   type AuthFormState,
 } from "../actions";
 
@@ -93,8 +94,8 @@ export function VerifyCodeForm({ email }: { email: string }) {
       <FormField label="Email" htmlFor="verify-email">
         <Input id="verify-email" name="email" type="email" autoComplete="email" required defaultValue={state?.values?.email ?? email} />
       </FormField>
-      <FormField label="6-digit code" htmlFor="token" hint="The code is in the same email as the link.">
-        <Input id="token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}" maxLength={6} required className="font-mono tracking-[0.3em]" />
+      <FormField label="Verification code" htmlFor="token" hint="The code is in the same email as the link.">
+        <Input id="token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6,10}" maxLength={10} required className="font-mono tracking-[0.3em]" />
       </FormField>
       <SubmitButton pendingLabel="Verifying…">Verify email</SubmitButton>
     </form>
@@ -117,15 +118,55 @@ export function ResendVerificationForm({ email }: { email: string }) {
   );
 }
 
+/** Step 1: email → code is sent. Step 2: enter the code (then /reset-password asks for the new password). */
 export function ForgotPasswordForm() {
   const [state, action] = useActionState<AuthFormState, FormData>(requestPasswordReset, null);
+  // The state object the user stepped back from ("Use a different email"); any new submission replaces it.
+  const [dismissed, setDismissed] = useState<AuthFormState>(null);
+  const onCodeStep = state !== dismissed && Boolean(state?.values?.email) && Boolean(state?.message || state?.values?.resend);
+
+  if (onCodeStep && state?.values?.email) {
+    const sentTo = state.values.email;
+    return (
+      <div className="grid gap-6">
+        <p className="text-sm text-muted-foreground">
+          Enter the code we sent to <strong className="text-foreground">{sentTo}</strong>. It may take a minute to arrive; check spam too.
+        </p>
+        <ResetCodeForm key={sentTo} email={sentTo} />
+        <form action={action} className="grid gap-3 border-t pt-6" noValidate>
+          <FormMessage error={state.error} message={state.values.resend ? state.message : undefined} />
+          <input type="hidden" name="email" value={sentTo} />
+          <input type="hidden" name="resend" value="1" />
+          <SubmitButton variant="outline" pendingLabel="Sending…">Resend code</SubmitButton>
+          <button type="button" onClick={() => setDismissed(state)} className="text-sm font-medium text-primary hover:underline">
+            Use a different email
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <form action={action} className="grid gap-4" noValidate>
-      <FormMessage error={state?.error} message={state?.message} />
+      <FormMessage error={state?.error} />
       <FormField label="University email" htmlFor="email">
-        <Input id="email" name="email" type="email" autoComplete="email" required />
+        <Input id="email" name="email" type="email" autoComplete="email" required defaultValue={state?.values?.email} />
       </FormField>
-      <SubmitButton size="lg" pendingLabel="Sending…">Send reset link</SubmitButton>
+      <SubmitButton size="lg" pendingLabel="Sending…">Send code</SubmitButton>
+    </form>
+  );
+}
+
+function ResetCodeForm({ email }: { email: string }) {
+  const [state, action] = useActionState<AuthFormState, FormData>(verifyResetCode, null);
+  return (
+    <form action={action} className="grid gap-3" noValidate>
+      <FormMessage error={state?.error} />
+      <input type="hidden" name="email" value={email} />
+      <FormField label="Reset code" htmlFor="reset-token">
+        <Input id="reset-token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6,10}" maxLength={10} required autoFocus className="font-mono tracking-[0.3em]" />
+      </FormField>
+      <SubmitButton size="lg" pendingLabel="Verifying…">Verify code</SubmitButton>
     </form>
   );
 }

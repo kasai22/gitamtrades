@@ -17,5 +17,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
-  return NextResponse.redirect(`${origin}/verify-email?error=link`);
+  const failure = next === "/reset-password" ? "/forgot-password?error=link" : "/verify-email?error=link";
+  return NextResponse.redirect(`${origin}${failure}`);
 }

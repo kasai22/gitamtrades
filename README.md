@@ -83,7 +83,7 @@ Local emails (the verification link and code) appear in Mailpit at http://127.0.
    <p>Your verification code is <strong>{{ .Token }}</strong></p>
    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/marketplace">Verify your university email</a></p>
    ```
-   Change the *Reset password* template link to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`. The default templates also work through `/auth/callback` (PKCE, same browser only).
+   Password reset is code-based: the *Reset password* template must include `{{ .Token }}`, which the student enters on `/forgot-password`. Old-style links (`/auth/confirm?...&type=recovery` or the default `/auth/callback`) still work if a template sends one.
 5. Configure a custom SMTP provider before the pilot. Supabase's built-in mailer is heavily rate-limited.
 6. **Realtime:** the migration adds `public.messages` to the `supabase_realtime` publication. Without Realtime, chat falls back to 15-second polling.
 7. Set up email verification (see below) and create the first admin.
