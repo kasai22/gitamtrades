@@ -20,7 +20,7 @@ const STEPS = [
 const PROMISES = [
   { icon: Banknote, text: "No fees, no commissions. Payment happens in person, never through the site." },
   { icon: ShieldCheck, text: "Automated checks stop prohibited items, and you can report anything suspicious." },
-  { icon: Sparkles, text: "Your phone number stays private unless you choose to share it in a chat." },
+  { icon: Sparkles, text: "Your phone number stays private unless you choose to share it." },
 ];
 
 export default function HomePage() {

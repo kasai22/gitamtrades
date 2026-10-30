@@ -47,7 +47,7 @@ export function classifierStatus(): ClassifierStatus {
 /** Built-in deterministic checks (engine.ts / process-image.ts), described for the admin console. */
 export const BUILT_IN_CHECKS: { name: string; action: "block" | "limit"; codes: ReasonCode[]; detail: string }[] = [
   { name: "Restricted keywords", action: "block", codes: ["prohibited_drugs", "prohibited_weapons", "counterfeit"], detail: "Policy rules below, matched after normalising case, accents, leetspeak, spacing and repeated letters." },
-  { name: "Contact details", action: "block", codes: ["contact_details_in_listing"], detail: "Phone numbers, email addresses and messaging links in public listing text." },
+  { name: "Contact details", action: "block", codes: ["contact_details_in_listing"], detail: "Email addresses and messaging links in public listing text. Phone numbers are allowed." },
   { name: "Payment details", action: "block", codes: ["payment_details_in_listing"], detail: "UPI IDs and payment handles." },
   { name: "Personal identifiers", action: "block", codes: ["sensitive_personal_data"], detail: "Aadhaar- and PAN-like numbers." },
   { name: "External links", action: "limit", codes: ["external_link"], detail: "Any URL: quarantined for review instead of published." },

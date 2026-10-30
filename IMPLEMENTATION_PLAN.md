@@ -116,7 +116,7 @@ Moderation outcomes on publish: **allow** → `active` + `clear`; **limit** (amb
 | I-13 | English-only UI; copy is centralised enough to localise later. | PRD §3.3 P1 languages. |
 | I-15 | **Pilot decision (29 Oct 2026): no campus meetup-area picker.** Buyers and sellers agree a place in chat ("Arrange in chat"). Safe-exchange guidance (busy, well-lit campus spots in daytime; inspect before paying; no advance payment) is shown non-blockingly on the sell form, listing detail and chat, and on `/safety`. The picker can be switched on later with `features.meetupAreas` plus areas in `/admin/universities`. | PRD A-03, journey 5.2 step 7 ("Arrange in chat" is a PRD option), SAFE-06. Closes the P0 meetup item for the pilot. |
 | I-16 | **Pilot decision (29 Oct 2026): ticket listings with photos publish quarantined for review** (`ticket_photo_review`, limit). A person checks the photos for barcodes, QR codes and booking codes before other students see the listing; ticket listings without photos, and photos in every other category, still publish immediately. Mitigates the missing 1-D barcode detection. | SAFE-01, SAFE-05, PRD §8.4. Publish-first is kept for all other listings. |
-| I-14 | Baseline Terms, Privacy Policy (DPDP Act aligned), Prohibited Items and Grievance Redressal pages are published under the Gitam Trades name, with Grievance Officer Dhanush (dhanush@gitamtrades.in). Not yet reviewed by counsel. | ADMIN-04, AC-16. Product name resolved: Gitam Trades. |
+| I-14 | Baseline Terms, Privacy Policy (DPDP Act aligned), Prohibited Items and Grievance Redressal pages are published under the Gitam Marketplace name, with Grievance Officer Dhanush (dhanush@gitam-marketplace.in). Not yet reviewed by counsel. | ADMIN-04, AC-16. Product name resolved: Gitam Marketplace. |
 
 ## 6. Security checklist
 
@@ -136,7 +136,7 @@ Moderation outcomes on publish: **allow** → `active` + `clear`; **limit** (amb
 | Run `tests/e2e/journeys.spec.ts` against a local/staging Supabase stack | Blocked (infrastructure) | Needs Docker + `supabase start` or a staging project |
 | Campus meetup areas | Resolved for the pilot | "Arrange in chat" with in-product safety guidance (I-15) |
 | Lawyer review of the published baseline policies | Legal (AC-16) | Recommended before scaling |
-| Custom SMTP for gitamtrades.in | Ops (blocks sign-up) | README → How email verification works |
+| Custom SMTP for gitam-marketplace.in | Ops (blocks sign-up) | README → How email verification works |
 | Image content classifier (nudity/illegal content) | Engineering, needs a provider | Hook into `processImage` / engine context |
 | Email notifications for new messages (CHAT-04, P1) | Engineering, needs SMTP/transactional email | |
 | Cleanup job for unattached uploads | Engineering | Capped at 30 per user meanwhile |

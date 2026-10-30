@@ -43,7 +43,7 @@ export default function TermsPage() {
           <li>You may list only items that you own or are authorised to sell and that are lawful to sell in India. You confirm this each time you publish a listing.</li>
           <li>Listings must be accurate and honest, including the item&apos;s condition and any defects. Photos must be your own and must not show other people&apos;s personal information, QR codes, barcodes or redeemable codes.</li>
           <li>The asking price is set by you and is not binding until you and the buyer agree. Messages on {name} are not orders or contracts made with us.</li>
-          <li>Do not include phone numbers, email addresses, payment IDs or links in listings. Buyers contact you through in-app chat.</li>
+          <li>Do not include email addresses, payment IDs or links in listings. You may include your own phone number, which every verified student can then see. Buyers can also contact you through in-app chat.</li>
           <li>Keep listings up to date: mark items as sold or on hold promptly. Listings expire automatically after a period of inactivity and can be renewed.</li>
           <li>Event tickets may be listed only where their transfer or resale is lawful and permitted by the event or venue&apos;s terms.</li>
         </ol>
@@ -52,8 +52,8 @@ export default function TermsPage() {
       <section>
         <h2>4. Community posts and comments</h2>
         <p>
-          Community threads are for discussion among verified students. Be respectful, stay on topic, and don&apos;t post anyone&apos;s personal
-          information, contact details, payment details or content described in the Prohibited Items Policy. You can delete your own posts and
+          Community threads are for discussion among verified students. Be respectful, stay on topic, and don&apos;t post other people&apos;s personal
+          information or contact details, payment details or content described in the Prohibited Items Policy. You can delete your own posts and
           comments at any time; they remain in the thread as &ldquo;[deleted]&rdquo;. Moderators may remove content, lock threads or restrict
           accounts that break these Terms.
         </p>

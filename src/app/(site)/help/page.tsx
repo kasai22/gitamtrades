@@ -9,7 +9,7 @@ const FAQ = [
   ["Who can join?", "Current GITAM students aged 18 or over, using their @student.gitam.edu email. Alumni, staff and personal email addresses can't be used."],
   ["Does anyone approve my listing?", "No. Listings go live straight after automated checks. Clear rule-breaking is blocked with an explanation, and some listings are checked by the safety team before they're shown."],
   ["How do I get paid?", "In person, when you meet the buyer. The marketplace never collects, holds or transfers money, and messages are not orders."],
-  ["Is my phone number visible?", "No. Your number is only shared if you tap Share contact inside a specific chat."],
+  ["Is my phone number visible?", "Only if you share it. The number saved in Settings goes only to people you tap Share contact for in a chat. A number you type into a listing or post is visible to every verified student."],
   ["What happens when I mark something sold?", "It disappears from search and browsing. People who saved it see that it's sold. You can relist it if the sale falls through."],
   ["Why did my listing expire?", "Listings expire after a set period so the marketplace stays current. You can renew it from My listings."],
   ["What does “University email verified” mean?", "Only that the person controls a GITAM student email address. It isn't proof of identity, so follow the safety tips."],

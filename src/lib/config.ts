@@ -3,11 +3,11 @@
  * database; this file holds deploy-time settings that are safe to expose to the browser.
  */
 export const appConfig = {
-  name: process.env.NEXT_PUBLIC_APP_NAME || "Gitam Trades",
+  name: process.env.NEXT_PUBLIC_APP_NAME || "Gitam Marketplace",
   tagline: "Buy and sell with fellow GITAM students.",
   /** Shown wherever the university is named, to avoid implying official endorsement (PRD Appendix B). */
   independenceNotice:
-    "Gitam Trades is an independent student marketplace. It is not owned, operated or endorsed by GITAM (Deemed to be University).",
+    "Gitam Marketplace is an independent student marketplace. It is not owned, operated or endorsed by GITAM (Deemed to be University).",
   /** Bump when Terms / Privacy / marketplace rules change; stored with each acceptance. */
   termsVersion: "2026-10-28",
   /** Seller declaration policy version recorded with each listing (LIST-06). */
@@ -17,10 +17,10 @@ export const appConfig = {
   /** ADMIN-04 / IT Rules 2021: Grievance Officer published on the Help and policy pages. */
   grievance: {
     name: process.env.NEXT_PUBLIC_GRIEVANCE_OFFICER_NAME || "Dhanush",
-    email: process.env.NEXT_PUBLIC_GRIEVANCE_EMAIL || "dhanush@gitamtrades.in",
+    email: process.env.NEXT_PUBLIC_GRIEVANCE_EMAIL || "dhanush@gitam-marketplace.in",
     address: process.env.NEXT_PUBLIC_GRIEVANCE_ADDRESS || "",
   },
-  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "dhanush@gitamtrades.in",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "dhanush@gitam-marketplace.in",
 } as const;
 
 /**

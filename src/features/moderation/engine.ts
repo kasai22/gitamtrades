@@ -8,7 +8,7 @@ import { REASON_MESSAGES, type PolicyConfig, type ReasonCode } from "./policy";
  * signals produce a "limit" outcome (hidden from others, routed to the admin queue), never a silent
  * deletion. See IMPLEMENTATION_PLAN.md I-06 / I-12.
  */
-export const ENGINE_VERSION = "1.0.0";
+export const ENGINE_VERSION = "1.1.0";
 
 export type ModerationOutcome = "allow" | "limit" | "block";
 export type ReasonSeverity = "block" | "limit";
@@ -98,11 +98,10 @@ function containsTerm(field: NormalizedField, term: string): boolean {
 }
 
 const PATTERNS = {
-  // Indian mobile numbers, optionally with +91 / 0 prefix and spaces or dashes.
-  phone: /(?<![\d])(?:\+?91[\s-]*|0)?[6-9](?:[\s-]?\d){9}(?![\d])/,
   upi: /\b[a-z0-9._-]{2,}@(?:ok)?(?:upi|ybl|ibl|axl|paytm|apl|yapl|sbi|icici|hdfcbank|axisbank|okaxis|oksbi|okhdfcbank|okicici|kotak|idfcbank|rbl|fbl|freecharge|jupiteraxis|barodampay)\b/i,
   email: /[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}/i,
-  aadhaar: /(?<![\d])\d{4}[\s-]?\d{4}[\s-]?\d{4}(?![\d])/,
+  // 12 digits, except +91 or 91 followed by a mobile number: phone numbers are allowed in public text.
+  aadhaar: /(?<![\d+])(?!91[6-9]\d{9}(?!\d))\d{4}[\s-]?\d{4}[\s-]?\d{4}(?![\d])/,
   pan: /\b[A-Z]{5}[0-9]{4}[A-Z]\b/,
   messagingLink: /\b(?:wa\.me|chat\.whatsapp\.com|t\.me|telegram\.me|instagram\.com|snapchat\.com)\b/i,
   url: /\b(?:https?:\/\/|www\.)\S+|\b[a-z0-9-]+\.(?:com|in|net|org|ly|me|io|co|link|xyz|app|site|shop|store|online|gl|gd)\b(?:\/\S*)?/i,
@@ -174,7 +173,7 @@ export function evaluateListing(candidate: ListingCandidate, context: Moderation
     }
   }
 
-  // 3. Privacy and payment patterns: contact details stay private by default (PRD §9.2).
+  // 3. Privacy and payment patterns. Phone numbers are deliberately allowed; sellers may publish their own.
   const upi = findPattern(rawFields, PATTERNS.upi);
   if (upi) add("payment_details_in_listing", "block", upi.field, upi.match);
   const messaging = findPattern(rawFields, PATTERNS.messagingLink);
@@ -185,8 +184,6 @@ export function evaluateListing(candidate: ListingCandidate, context: Moderation
   if (aadhaar) add("sensitive_personal_data", "block", aadhaar.field, aadhaar.match);
   const pan = findPattern(rawFields, PATTERNS.pan);
   if (pan) add("sensitive_personal_data", "block", pan.field, pan.match);
-  const phone = aadhaar ? null : findPattern(rawFields, PATTERNS.phone);
-  if (phone) add("contact_details_in_listing", "block", phone.field, phone.match);
   const url = email || messaging ? null : findPattern(rawFields, PATTERNS.url);
   if (url) add("external_link", "limit", url.field, url.match);
 
@@ -234,7 +231,7 @@ const SHORTENER = /\b(?:bit\.ly|tinyurl\.com|t\.co|goo\.gl|cutt\.ly|rb\.gy|is\.g
 
 const COMMUNITY_MESSAGES: Partial<Record<ReasonCode, string>> = {
   contact_details_in_listing:
-    "Remove phone numbers or email addresses. Posts are visible to every verified student; share contact details privately in chat instead.",
+    "Remove email addresses. Posts are visible to every verified student; share them privately in chat instead.",
   payment_details_in_listing: "Remove UPI IDs or payment details. Never collect money through a post.",
   external_link: "Shortened links hide where they go, so this will be checked first. Paste the full link instead.",
 };
@@ -279,8 +276,6 @@ export function evaluateCommunityText(
   if (email) add("contact_details_in_listing", "block", email.field, email.match);
   const aadhaar = findPattern(rawFields, PATTERNS.aadhaar) ?? findPattern(rawFields, PATTERNS.pan);
   if (aadhaar) add("sensitive_personal_data", "block", aadhaar.field, aadhaar.match);
-  const phone = findPattern(rawFields, PATTERNS.phone);
-  if (phone) add("contact_details_in_listing", "block", phone.field, phone.match);
   const shortener = findPattern(rawFields, SHORTENER);
   if (shortener) add("external_link", "limit", shortener.field, shortener.match);
 

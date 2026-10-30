@@ -42,7 +42,7 @@ export function PostForm({ defaultTopic }: { defaultTopic?: Topic }) {
         <Textarea id="body" name="body" rows={8} maxLength={MAX_POST_BODY} defaultValue={state?.values?.body} {...describedBy("body", errors.body)} />
       </FormField>
       <p className="text-xs text-muted-foreground">
-        Be kind and keep it about campus life. Don&apos;t share phone numbers, IDs or anyone&apos;s personal details. Posts follow the{" "}
+        Be kind and keep it about campus life. Don&apos;t share ID numbers or other people&apos;s personal details. Any phone number you post is visible to every verified student. Posts follow the{" "}
         <Link href="/terms" className="font-medium text-primary hover:underline">Terms of Use</Link> and{" "}
         <Link href="/policies/prohibited-items" className="font-medium text-primary hover:underline">marketplace rules</Link>.
       </p>

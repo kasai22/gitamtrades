@@ -60,7 +60,7 @@ export default function ProhibitedItemsPage() {
       <section>
         <h2>Keep your listing private and safe</h2>
         <ul>
-          <li>Don&apos;t put phone numbers, emails, UPI IDs or messaging links in listings. Buyers contact you through chat, where you choose what to share.</li>
+          <li>Don&apos;t put emails, UPI IDs or messaging links in listings. You can add your phone number, but every verified student will see it. Buyers can also contact you through chat.</li>
           <li>Don&apos;t include ID numbers, your room number or your live location. Agree a public meetup spot in chat instead.</li>
           <li>Use your own photos and describe defects honestly.</li>
         </ul>

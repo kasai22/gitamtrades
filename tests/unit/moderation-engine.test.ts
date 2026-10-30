@@ -31,7 +31,7 @@ describe("evaluateListing", () => {
     const decision = evaluate({});
     expect(decision.outcome).toBe("allow");
     expect(decision.reasons).toEqual([]);
-    expect(decision.ruleVersion).toBe("p1/e1.0.0");
+    expect(decision.ruleVersion).toBe("p1/e1.1.0");
   });
 
   it("allows near-miss everyday items", () => {
@@ -68,17 +68,23 @@ describe("evaluateListing", () => {
     expect(decision.reasons[0].code).toBe("needs_review_term");
   });
 
-  it("blocks contact details, payment ids and ID numbers in public text", () => {
-    expect(codes({ description: "Call me on 98765 43210" })).toContain("contact_details_in_listing");
-    expect(codes({ description: "call +91-9876543210" })).toContain("contact_details_in_listing");
+  it("allows phone numbers in any common format", () => {
+    for (const description of ["Call me on 98765 43210", "call +91-9876543210", "ph 9876543210", "+919876543210", "919876543210", "09876543210"]) {
+      expect(evaluate({ description }).outcome, description).toBe("allow");
+    }
+    expect(evaluate({ title: "Notes, call 9876543210" }).outcome).toBe("allow");
+  });
+
+  it("blocks emails, messaging links, payment ids and ID numbers in public text", () => {
     expect(codes({ description: "mail me at abc@gmail.com" })).toContain("contact_details_in_listing");
     expect(codes({ description: "whatsapp wa.me/919876543210" })).toContain("contact_details_in_listing");
     expect(codes({ description: "GPay to rahul@okaxis" })).toContain("payment_details_in_listing");
     expect(codes({ description: "Aadhaar 1234 5678 9012 attached" })).toContain("sensitive_personal_data");
+    expect(codes({ description: "Aadhaar 9198 7654 3210" })).toContain("sensitive_personal_data");
     expect(codes({ description: "PAN ABCDE1234F" })).toContain("sensitive_personal_data");
   });
 
-  it("does not mistake ISBNs, model numbers or prices for phone numbers", () => {
+  it("does not mistake ISBNs, model numbers or prices for ID numbers", () => {
     expect(evaluate({ description: "ISBN 9780131103627, model 2023, price 6500" }).outcome).toBe("allow");
   });
 
@@ -130,7 +136,7 @@ describe("evaluateListing", () => {
   });
 
   it("orders blocking reasons before review reasons", () => {
-    const decision = evaluate({ description: "Kitchen knife. Call 9876543210" });
+    const decision = evaluate({ description: "Kitchen knife. Mail abc@gmail.com" });
     expect(decision.outcome).toBe("block");
     expect(decision.reasons[0].severity).toBe("block");
     expect(decision.reasons.at(-1)?.severity).toBe("limit");

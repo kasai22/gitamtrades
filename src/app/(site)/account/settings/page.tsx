@@ -41,7 +41,7 @@ export default async function SettingsPage() {
           <ProfileForm displayName={viewer.displayName} avatarUrl={avatarUrl} />
         </Section>
 
-        <Section title="Contact sharing" description="Your contact details are never shown on listings.">
+        <Section title="Contact sharing" description="Your saved number is never shown on listings.">
           <ContactPhoneForm phone={privateProfile?.contact_phone ?? null} />
         </Section>
 

@@ -86,7 +86,7 @@ export default function PrivacyPage() {
         <h2>6. Security</h2>
         <p>
           Data is encrypted in transit, access is restricted by role and enforced in the database, listing photos are stored privately and
-          served through short-lived links, and contact details are never published on listings. No system is perfectly secure; if a breach
+          served through short-lived links, and your saved contact number is never published on listings. No system is perfectly secure; if a breach
           affects your personal data we will notify you and the authorities as required by law.
         </p>
       </section>

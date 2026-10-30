@@ -1,4 +1,4 @@
-# Gitam Trades
+# Gitam Marketplace
 
 A student-only, peer-to-peer marketplace where verified GITAM students buy, sell and pass on items on campus. It's built from [`PRD.md`](PRD.md) (v1.0). The architecture and decisions are in [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md), and per-requirement status is in [`REQUIREMENTS_TRACEABILITY.md`](REQUIREMENTS_TRACEABILITY.md).
 
@@ -12,7 +12,7 @@ A student-only, peer-to-peer marketplace where verified GITAM students buy, sell
 >
 > **Pilot decision:** event-ticket listings **with photos** publish quarantined until a moderator checks the photos for barcodes, QR codes and booking codes (`ticket_photo_review`). Review them in **/admin/listings?state=quarantined&signal=ticket_photo_review**. Text-only ticket listings and all other categories publish immediately.
 >
-> Launch configuration: GITAM (Deemed to be University), allowlisted domain `student.gitam.edu` (migration `20261028000006_gitam_launch.sql`). Sellers choose "Arrange in chat" (no meetup areas for the pilot). Grievance Officer: Dhanush, dhanush@gitamtrades.in.
+> Launch configuration: GITAM (Deemed to be University), allowlisted domain `student.gitam.edu` (migration `20261028000006_gitam_launch.sql`). Sellers choose "Arrange in chat" (no meetup areas for the pilot). Grievance Officer: Dhanush, dhanush@gitam-marketplace.in.
 
 ## Stack
 
@@ -97,9 +97,9 @@ Local emails (the verification link and code) appear in Mailpit at http://127.0.
 To make it work on your Supabase project:
 
 - **Authentication → Sign In / Providers → Email:** turn on *Confirm email*.
-- **Authentication → URL Configuration:** Site URL = your site (e.g. `https://gitamtrades.in`). Redirect URLs: `https://gitamtrades.in/auth/confirm`, `https://gitamtrades.in/auth/callback`, plus `http://localhost:3000/**` for development.
+- **Authentication → URL Configuration:** Site URL = your site (e.g. `https://gitam-marketplace.in`). Redirect URLs: `https://gitam-marketplace.in/auth/confirm`, `https://gitam-marketplace.in/auth/callback`, plus `http://localhost:3000/**` for development.
 - **Authentication → Emails → Templates:** paste `supabase/templates/confirm-signup.html` into *Confirm signup*, `reset-password.html` into *Reset password* and `change-email.html` into *Change email address*. Each file's first line has the subject.
-- **Authentication → Emails → SMTP Settings (required).** Supabase's built-in sender only delivers to your own project team's addresses and is heavily rate-limited, so students won't receive anything without custom SMTP. Use a transactional provider (e.g. Resend, Amazon SES, Brevo or Zoho ZeptoMail). Verify `gitamtrades.in` there by adding its SPF, DKIM and DMARC DNS records, and send from an address like `no-reply@gitamtrades.in`. Authenticated mail is far less likely to land in spam on GITAM's mail system.
+- **Authentication → Emails → SMTP Settings (required).** Supabase's built-in sender only delivers to your own project team's addresses and is heavily rate-limited, so students won't receive anything without custom SMTP. Use a transactional provider (e.g. Resend, Amazon SES, Brevo or Zoho ZeptoMail). Verify `gitam-marketplace.in` there by adding its SPF, DKIM and DMARC DNS records, and send from an address like `no-reply@gitam-marketplace.in`. Authenticated mail is far less likely to land in spam on GITAM's mail system.
 - Test by signing up with your own `@student.gitam.edu` address.
 
 Domains and meetup areas can be changed later in **/admin/universities** (Super Admin, audited). Generic email providers are always rejected there.
@@ -148,8 +148,8 @@ select cron.schedule('expire-listings', '15 * * * *', $$select public.expire_sta
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or `NEXT_PUBLIC_SUPABASE_ANON_KEY`) | browser + server | Publishable key; RLS enforces access |
 | `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) | **server only** | Service client for `persist_listing`, admin actions, audit and analytics |
 | `NEXT_PUBLIC_SITE_URL` | server | Origin used in email redirect links |
-| `NEXT_PUBLIC_APP_NAME` | browser | Product name (default "Gitam Trades") |
-| `NEXT_PUBLIC_GRIEVANCE_*`, `NEXT_PUBLIC_SUPPORT_EMAIL` | browser | Grievance Officer and support contact (defaults: Dhanush, dhanush@gitamtrades.in) |
+| `NEXT_PUBLIC_APP_NAME` | browser | Product name (default "Gitam Marketplace") |
+| `NEXT_PUBLIC_GRIEVANCE_*`, `NEXT_PUBLIC_SUPPORT_EMAIL` | browser | Grievance Officer and support contact (defaults: Dhanush, dhanush@gitam-marketplace.in) |
 
 Variables are validated lazily in `src/lib/env.ts` and `src/lib/env.server.ts`. If Supabase isn't configured, auth pages show a "Backend not configured" notice instead of fake data.
 

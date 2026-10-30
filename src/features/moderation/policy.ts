@@ -54,7 +54,7 @@ export const REASON_MESSAGES: Record<ReasonCode, string> = {
   possible_scam_language:
     "Phrases like 'advance payment', 'token amount' or 'share OTP' are common in scams, so the safety team will check this listing first. Payment should only happen in person after inspecting the item.",
   contact_details_in_listing:
-    "Remove phone numbers, email addresses or messaging links. Buyers reach you through in-app chat, where you can choose to share contact details privately.",
+    "Remove email addresses or messaging links. Buyers can reach you through in-app chat, where you can share them privately.",
   payment_details_in_listing:
     "Remove UPI IDs or payment details. Payment is arranged in person between you and the buyer, never through the listing.",
   sensitive_personal_data: "Remove ID numbers (such as Aadhaar or PAN) from the listing to protect your privacy.",
