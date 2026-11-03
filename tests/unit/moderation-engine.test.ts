@@ -31,7 +31,7 @@ describe("evaluateListing", () => {
     const decision = evaluate({});
     expect(decision.outcome).toBe("allow");
     expect(decision.reasons).toEqual([]);
-    expect(decision.ruleVersion).toBe("p1/e1.1.0");
+    expect(decision.ruleVersion).toBe("p1/e1.2.0");
   });
 
   it("allows near-miss everyday items", () => {
@@ -75,9 +75,22 @@ describe("evaluateListing", () => {
     expect(evaluate({ title: "Notes, call 9876543210" }).outcome).toBe("allow");
   });
 
-  it("blocks emails, messaging links, payment ids and ID numbers in public text", () => {
-    expect(codes({ description: "mail me at abc@gmail.com" })).toContain("contact_details_in_listing");
-    expect(codes({ description: "whatsapp wa.me/919876543210" })).toContain("contact_details_in_listing");
+  it("allows emails and messaging links without holding them as external links", () => {
+    for (const description of [
+      "mail me at abc@gmail.com",
+      "whatsapp wa.me/919876543210",
+      "DM https://www.instagram.com/some.seller/",
+      "telegram t.me/seller123 or seller@student.gitam.edu",
+    ]) {
+      expect(evaluate({ description }).outcome, description).toBe("allow");
+    }
+  });
+
+  it("still holds other links that appear next to contact details", () => {
+    expect(codes({ description: "mail abc@gmail.com, specs at example.com/specs" })).toEqual(["external_link"]);
+  });
+
+  it("blocks payment ids and ID numbers in public text", () => {
     expect(codes({ description: "GPay to rahul@okaxis" })).toContain("payment_details_in_listing");
     expect(codes({ description: "Aadhaar 1234 5678 9012 attached" })).toContain("sensitive_personal_data");
     expect(codes({ description: "Aadhaar 9198 7654 3210" })).toContain("sensitive_personal_data");
@@ -136,7 +149,7 @@ describe("evaluateListing", () => {
   });
 
   it("orders blocking reasons before review reasons", () => {
-    const decision = evaluate({ description: "Kitchen knife. Mail abc@gmail.com" });
+    const decision = evaluate({ description: "Kitchen knife. GPay to rahul@okaxis" });
     expect(decision.outcome).toBe("block");
     expect(decision.reasons[0].severity).toBe("block");
     expect(decision.reasons.at(-1)?.severity).toBe("limit");

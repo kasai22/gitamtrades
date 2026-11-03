@@ -8,7 +8,7 @@ import { REASON_MESSAGES, type PolicyConfig, type ReasonCode } from "./policy";
  * signals produce a "limit" outcome (hidden from others, routed to the admin queue), never a silent
  * deletion. See IMPLEMENTATION_PLAN.md I-06 / I-12.
  */
-export const ENGINE_VERSION = "1.1.0";
+export const ENGINE_VERSION = "1.2.0";
 
 export type ModerationOutcome = "allow" | "limit" | "block";
 export type ReasonSeverity = "block" | "limit";
@@ -103,11 +103,15 @@ const PATTERNS = {
   // 12 digits, except +91 or 91 followed by a mobile number: phone numbers are allowed in public text.
   aadhaar: /(?<![\d+])(?!91[6-9]\d{9}(?!\d))\d{4}[\s-]?\d{4}[\s-]?\d{4}(?![\d])/,
   pan: /\b[A-Z]{5}[0-9]{4}[A-Z]\b/,
-  messagingLink: /\b(?:wa\.me|chat\.whatsapp\.com|t\.me|telegram\.me|instagram\.com|snapchat\.com)\b/i,
   url: /\b(?:https?:\/\/|www\.)\S+|\b[a-z0-9-]+\.(?:com|in|net|org|ly|me|io|co|link|xyz|app|site|shop|store|online|gl|gd)\b(?:\/\S*)?/i,
   // "Booking ID: 8F3K29", "ticket no 123456" and similar labelled codes.
   labelledCode: /\b(?:booking|ticket|order|pnr|confirmation)\s*(?:id|no|number|code|ref)?\s*[:#-]?\s*(?=[a-z0-9]*\d)[a-z0-9]{6,}\b/i,
 };
+
+/** Allowed contact details in listings, removed before the external-link check. */
+const CONTACT_LINK =
+  /\b(?:https?:\/\/)?(?:www\.)?(?:wa\.me|chat\.whatsapp\.com|t\.me|telegram\.me|instagram\.com|snapchat\.com)\b(?:\/\S*)?/gi;
+const EMAIL_GLOBAL = new RegExp(PATTERNS.email.source, "gi");
 
 /** Finds the first match of `pattern` and reports which field it was in. */
 function findPattern(fields: { field: ReasonField; text: string }[], pattern: RegExp) {
@@ -173,18 +177,20 @@ export function evaluateListing(candidate: ListingCandidate, context: Moderation
     }
   }
 
-  // 3. Privacy and payment patterns. Phone numbers are deliberately allowed; sellers may publish their own.
+  // 3. Privacy and payment patterns. Contact details (phone numbers, email addresses and messaging
+  // links) are deliberately allowed so listing stays hassle-free; sellers may publish their own.
   const upi = findPattern(rawFields, PATTERNS.upi);
   if (upi) add("payment_details_in_listing", "block", upi.field, upi.match);
-  const messaging = findPattern(rawFields, PATTERNS.messagingLink);
-  if (messaging) add("contact_details_in_listing", "block", messaging.field, messaging.match);
-  const email = upi ? null : findPattern(rawFields, PATTERNS.email);
-  if (email) add("contact_details_in_listing", "block", email.field, email.match);
   const aadhaar = findPattern(rawFields, PATTERNS.aadhaar);
   if (aadhaar) add("sensitive_personal_data", "block", aadhaar.field, aadhaar.match);
   const pan = findPattern(rawFields, PATTERNS.pan);
   if (pan) add("sensitive_personal_data", "block", pan.field, pan.match);
-  const url = email || messaging ? null : findPattern(rawFields, PATTERNS.url);
+  // Strip the allowed contact details first so "abc@gmail.com" or "wa.me/91..." aren't held as external links.
+  const linkFields = rawFields.map(({ field, text }) => ({
+    field,
+    text: text.replace(CONTACT_LINK, " ").replace(EMAIL_GLOBAL, " "),
+  }));
+  const url = findPattern(linkFields, PATTERNS.url);
   if (url) add("external_link", "limit", url.field, url.match);
 
   // 4. Event tickets: never expose redeemable codes or QR images (PRD §8.2, §8.4).
