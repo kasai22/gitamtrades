@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { MessageCircle, Plus, Store } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { Button } from "@/components/ui/button";
 import { getViewer } from "@/lib/auth/session";
 import { appConfig } from "@/lib/config";
@@ -14,12 +15,9 @@ import { UserMenu } from "./user-menu";
 
 export function Logo() {
   return (
-    <Link href="/" className="flex shrink-0 items-center gap-2 rounded-md font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <Store className="size-4.5" aria-hidden />
-      </span>
-      <span className="hidden sm:inline">{appConfig.name}</span>
-      <span className="sr-only sm:hidden">{appConfig.name} home</span>
+    <Link href="/" aria-label={`${appConfig.name} home`} className="flex shrink-0 items-center rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+      <BrandLogo variant="mark" alt="" eager className="h-8 sm:hidden" />
+      <BrandLogo alt="" eager className="hidden h-9 sm:block" />
     </Link>
   );
 }

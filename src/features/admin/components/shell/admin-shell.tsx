@@ -27,6 +27,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,8 +94,8 @@ export function AdminShell({ nav, user, initialCollapsed, appName, children }: S
       >
         <div className={cn("flex h-14 items-center border-b px-3", collapsed ? "justify-center" : "justify-between")}>
           {!collapsed && (
-            <Link href="/admin" className="truncate text-sm font-semibold">
-              {appName} <span className="font-normal text-muted-foreground">Admin</span>
+            <Link href="/admin" aria-label={`${appName} Admin`} className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+              <BrandLogo alt="" eager className="h-7" /> Admin
             </Link>
           )}
           <Button variant="ghost" size="icon-sm" onClick={toggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed}>
@@ -198,7 +199,9 @@ function AdminHeader({ nav, user, appName }: { nav: NavGroup[]; user: ShellProps
         </SheetTrigger>
         <SheetContent side="left" className="w-72 max-w-[85vw] p-0">
           <SheetHeader className="border-b">
-            <SheetTitle>{appName} Admin</SheetTitle>
+            <SheetTitle className="flex items-center gap-2 font-normal text-muted-foreground">
+              <BrandLogo alt={appName} className="h-7" /> Admin
+            </SheetTitle>
             <SheetDescription className="sr-only">Admin navigation</SheetDescription>
           </SheetHeader>
           <SidebarNav nav={nav} onNavigate={() => setOpen(false)} />

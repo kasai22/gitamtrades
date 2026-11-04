@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Heart, Home, LayoutDashboard, LogOut, Menu, MessageCircle, MessagesSquare, Package, Plus, Settings, ShieldCheck, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { HeaderSearch } from "./header-search";
@@ -37,6 +38,7 @@ export function MobileNav({ unread, isStaff }: { unread: number; isStaff: boolea
       </SheetTrigger>
       <SheetContent side="right" className="w-80 max-w-[85vw]">
         <SheetHeader>
+          <BrandLogo className="mb-2 h-8 self-start" />
           <SheetTitle>Menu</SheetTitle>
           <SheetDescription className="sr-only">Site navigation</SheetDescription>
         </SheetHeader>

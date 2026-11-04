@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ShieldCheck } from "lucide-react";
-import { appConfig } from "@/lib/config";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { safeNextPath } from "@/lib/security/safe-redirect";
 import { AdminLoginForm } from "@/features/admin/components/admin-login-form";
 
@@ -13,9 +13,11 @@ export default function AdminLoginPage({ searchParams }: PageProps<"/admin/login
   return (
     <main id="main" className="flex min-h-svh items-center justify-center bg-muted/40 px-4 py-10">
       <div className="w-full max-w-sm rounded-2xl border bg-card p-6 shadow-sm">
-        <div className="mb-5 flex items-center gap-2">
-          <ShieldCheck className="size-5 text-primary" aria-hidden />
-          <h1 className="text-lg font-semibold">{appConfig.name} admin</h1>
+        <div className="mb-5 grid gap-4">
+          <BrandLogo className="h-10" eager />
+          <h1 className="flex items-center gap-2 text-lg font-semibold">
+            <ShieldCheck className="size-5 text-primary" aria-hidden /> Admin sign-in
+          </h1>
         </div>
         <Suspense fallback={<div className="h-56 animate-pulse rounded-lg bg-muted" />}>
           <LoginBody searchParams={searchParams} />

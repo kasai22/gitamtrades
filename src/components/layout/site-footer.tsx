@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { appConfig } from "@/lib/config";
 
 /** ADMIN-04: grievance/help entry points are on every page. */
@@ -7,8 +8,8 @@ export function SiteFooter() {
     <footer className="mt-auto border-t bg-muted/40">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 text-sm sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-semibold">{appConfig.name}</p>
-          <p className="mt-2 max-w-sm text-muted-foreground">
+          <BrandLogo className="h-10" />
+          <p className="mt-3 max-w-sm text-muted-foreground">
             The marketplace for verified GITAM students. Students arrange exchanges and payments themselves; we never process
             payments or guarantee items.
           </p>
