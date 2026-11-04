@@ -16,7 +16,7 @@ export default async function FavouritesPage() {
       {listings.length === 0 ? (
         <EmptyState icon={Heart} title="Nothing saved yet" description="Tap Save on a listing to keep track of it." action={{ href: "/marketplace", label: "Browse listings" }} />
       ) : (
-        <ProductGrid listings={listings} />
+        <ProductGrid listings={listings} savedIds={new Set(listings.map((l) => l.id))} />
       )}
     </>
   );

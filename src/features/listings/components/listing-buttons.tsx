@@ -31,6 +31,31 @@ export function FavouriteButton({ listingId, initialSaved }: { listingId: string
   );
 }
 
+/** Compact heart toggle that sits on a listing card's photo, above the card's full-size link. */
+export function CardFavouriteButton({ listingId, title, initialSaved }: { listingId: string; title: string; initialSaved: boolean }) {
+  const [saved, setSaved] = useOptimistic(initialSaved);
+  const [pending, startTransition] = useTransition();
+  return (
+    <button
+      type="button"
+      aria-pressed={saved}
+      aria-label={saved ? `Remove ${title} from saved items` : `Save ${title}`}
+      disabled={pending}
+      onClick={() =>
+        startTransition(async () => {
+          setSaved(!saved);
+          const result = await toggleFavourite(listingId, !saved);
+          if (!result.ok) toast.error(result.error);
+          else toast.success(result.data.saved ? "Saved for later." : "Removed from saved items.");
+        })
+      }
+      className="relative z-10 flex size-9 items-center justify-center rounded-full bg-card/95 text-foreground shadow-sm ring-1 ring-border/60 backdrop-blur transition-colors outline-none hover:bg-card hover:text-destructive focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-70"
+    >
+      <Heart className={cn("size-4.5", saved && "fill-destructive text-destructive")} aria-hidden />
+    </button>
+  );
+}
+
 /** "Chat with seller": opens the existing conversation or creates one with the listing attached (CHAT-01). */
 export function ContactSellerButton({ listingId, label = "Chat with seller" }: { listingId: string; label?: string }) {
   const [pending, startTransition] = useTransition();

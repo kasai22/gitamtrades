@@ -177,6 +177,14 @@ export async function getListingViewerState(listingId: string, viewerId: string)
   return { isFavourite: Boolean(favourite.data), conversationId: conversation.data?.id ?? null };
 }
 
+/** Which of `listingIds` the viewer has saved, so listing cards can show a filled heart. */
+export async function getSavedListingIds(viewerId: string, listingIds: string[]): Promise<Set<string>> {
+  if (listingIds.length === 0) return new Set();
+  const supabase = await createClient();
+  const { data } = await supabase.from("favourites").select("listing_id").eq("user_id", viewerId).in("listing_id", listingIds);
+  return new Set((data ?? []).map((f) => f.listing_id));
+}
+
 export type SellerListing = {
   id: string;
   title: string;

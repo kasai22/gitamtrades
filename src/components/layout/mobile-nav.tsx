@@ -43,7 +43,7 @@ export function MobileNav({ unread, isStaff }: { unread: number; isStaff: boolea
           <SheetDescription className="sr-only">Site navigation</SheetDescription>
         </SheetHeader>
         <div className="px-4">
-          <HeaderSearch />
+          <HeaderSearch inputId="mobile-nav-search" />
         </div>
         <nav aria-label="Mobile" className="mt-2 flex flex-col px-2" onClick={() => setOpen(false)}>
           {links.map(({ href, label, icon: Icon }) => {

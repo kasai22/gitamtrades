@@ -113,6 +113,17 @@
   }
 }
 
+/* Decorative dot grid for hero and banner backgrounds; uses the existing border/foreground tokens. */
+@utility pattern-dots {
+  background-image: radial-gradient(color-mix(in oklch, var(--foreground) 12%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+@utility pattern-dots-light {
+  background-image: radial-gradient(color-mix(in oklch, var(--primary-foreground) 22%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

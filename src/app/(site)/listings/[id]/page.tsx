@@ -17,7 +17,7 @@ import { CONDITION_LABELS } from "@/features/listings/constants";
 import { ProductImageGallery } from "@/features/listings/components/image-gallery";
 import { ContactSellerButton, FavouriteButton, ShareButton } from "@/features/listings/components/listing-buttons";
 import { SellerControls } from "@/features/listings/components/seller-controls";
-import { getListing, getListingViewerState, searchListings } from "@/features/listings/queries";
+import { getListing, getListingViewerState, getSavedListingIds, searchListings } from "@/features/listings/queries";
 import { effectiveStatus, isContactable } from "@/features/listings/status";
 import { ModerationNotice } from "@/features/moderation/components/moderation-notice";
 import { ReportDialog } from "@/features/moderation/components/report-dialog";
@@ -46,6 +46,7 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
     loadActivePolicy(),
   ]);
   const relatedItems = related.items.filter((item) => item.id !== listing.id).slice(0, 4);
+  const relatedSaved = await getSavedListingIds(viewer.id, relatedItems.map((item) => item.id));
   if (!isOwner) track("listing_viewed", viewer.id, { listing_id: listing.id, category: listing.category.slug });
 
   return (
@@ -191,7 +192,7 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
       {relatedItems.length > 0 && (
         <section className="mt-12" aria-labelledby="related-heading">
           <h2 id="related-heading" className="mb-4 text-xl font-semibold">More in {listing.category.name}</h2>
-          <ProductGrid listings={relatedItems} />
+          <ProductGrid listings={relatedItems} savedIds={relatedSaved} />
         </section>
       )}
     </PageContainer>
