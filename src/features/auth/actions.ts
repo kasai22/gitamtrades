@@ -1,12 +1,15 @@
 "use server";
 
+import { createHash } from "node:crypto";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { track } from "@/lib/analytics";
-import { appConfig } from "@/lib/config";
+import { EMAIL_OTP_LENGTH, appConfig } from "@/lib/config";
 import { publicEnv } from "@/lib/env";
 import { friendlyError } from "@/lib/errors";
 import { safeNextPath } from "@/lib/security/safe-redirect";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getPlatformSettings } from "@/features/admin/settings";
 
@@ -97,8 +100,11 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
   redirect(safeNextPath(raw.next));
 }
 
-// Supabase lets each project set the email OTP length (6–10 digits), so don't hard-code 6.
-const otpToken = z.string().trim().regex(/^\d{6,10}$/, "Enter the code from the email.");
+// Must match the "Email OTP Length" setting in Supabase Auth.
+const otpToken = z
+  .string()
+  .trim()
+  .regex(new RegExp(`^\\d{${EMAIL_OTP_LENGTH}}$`), `Enter the ${EMAIL_OTP_LENGTH}-digit code from the email.`);
 const otpSchema = z.object({ email, token: otpToken });
 
 /** AUTH-02: verify with the 6-digit code (useful when the link is opened on another device). */
@@ -130,15 +136,69 @@ export async function resendVerification(_prev: AuthFormState, formData: FormDat
   return { message: "If that address has a pending account, a new verification email is on its way.", values: { email: parsed.data } };
 }
 
+/** Attempt limits for the password-reset forms, per email address and per IP (on top of Supabase Auth's). */
+const RESET_LIMITS = {
+  // Campus Wi-Fi can put many students behind one IP, so the IP limits are generous.
+  request: { action: "password_reset.request", perEmail: 5, perIp: 30, window: "1 hour" },
+  verify: { action: "password_reset.verify", perEmail: 10, perIp: 60, window: "15 minutes" },
+} as const;
+
+function attemptKey(action: string, kind: string, value: string) {
+  return createHash("sha256").update(`${action}:${kind}:${value}`).digest("hex");
+}
+
+/**
+ * Records an attempt and returns false once the email or IP is over its limit. Fails open (logs and
+ * allows) if the check itself is unavailable, e.g. before the migration is applied, so reset never breaks.
+ */
+async function resetAttemptAllowed(limit: (typeof RESET_LIMITS)[keyof typeof RESET_LIMITS], emailAddress: string) {
+  const headerList = await headers();
+  const ip = headerList.get("x-forwarded-for")?.split(",")[0]?.trim() || headerList.get("x-real-ip")?.trim() || "";
+  const keys = [attemptKey(limit.action, "email", emailAddress)];
+  const limits: number[] = [limit.perEmail];
+  if (ip) {
+    keys.push(attemptKey(limit.action, "ip", ip));
+    limits.push(limit.perIp);
+  }
+  const { data, error } = await createAdminClient().rpc("auth_attempt_allowed", {
+    p_action: limit.action,
+    p_keys: keys,
+    p_limits: limits,
+    p_window: limit.window,
+  });
+  if (error) {
+    console.error("[password-reset] auth_attempt_allowed failed", error.code, error.message);
+    return true;
+  }
+  return data !== false;
+}
+
+/**
+ * Sends a reset code to a university address. The reply is the same whether or not the address has
+ * an account (prevents account enumeration); Auth only emails addresses that do.
+ */
 export async function requestPasswordReset(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const parsed = email.safeParse(formData.get("email"));
   if (!parsed.success) return { error: "Enter a valid email address." };
+  // `resend` keeps the form on the code step when a resend fails.
+  const values = { email: parsed.data, ...(formData.get("resend") === "1" ? { resend: "1" } : {}) };
   const supabase = await createClient();
+
+  // Which domains are allowed is public, so rejecting a personal address reveals nothing about accounts.
+  const { data: domain, error: domainError } = await supabase.rpc("check_email_domain", { p_email: parsed.data });
+  if (domainError) {
+    console.error("[password-reset] check_email_domain failed", domainError.code, domainError.message);
+  } else if (!domain?.[0]?.allowed) {
+    return { error: "Use your university email address. Personal addresses (Gmail, Yahoo, Outlook…) can't be used.", values };
+  }
+
+  if (!(await resetAttemptAllowed(RESET_LIMITS.request, parsed.data))) {
+    return { error: "Too many reset requests. Wait an hour and try again, or use the latest code you received.", values };
+  }
+
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: `${publicEnv().siteUrl}/auth/callback?next=/reset-password`,
   });
-  // `resend` keeps the form on the code step when a resend fails.
-  const values = { email: parsed.data, ...(formData.get("resend") === "1" ? { resend: "1" } : {}) };
   // Auth limits both the interval per address (about a minute) and emails per hour across the project.
   if (error?.status === 429) {
     return { error: "Too many codes were requested. Use the latest code you received, or wait a few minutes and try again.", values };
@@ -149,7 +209,12 @@ export async function requestPasswordReset(_prev: AuthFormState, formData: FormD
     return { error: "We couldn't send the code right now. Try again in a few minutes.", values };
   }
   // Same response whether or not the address has an account (prevents account enumeration).
-  return { message: values.resend ? "We've sent a new code. Use the latest one." : "Code sent.", values };
+  return {
+    message: values.resend
+      ? "If an account exists for this email, we've sent a new code. Use the latest one."
+      : "If an account exists for this email, we've sent a code. Please check your inbox.",
+    values,
+  };
 }
 
 /** Password recovery with the one-time code from the reset email. */
@@ -157,6 +222,10 @@ export async function verifyResetCode(_prev: AuthFormState, formData: FormData):
   const raw = Object.fromEntries(formData) as Record<string, string>;
   const parsed = otpSchema.safeParse(raw);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message, values: { email: raw.email ?? "" } };
+
+  if (!(await resetAttemptAllowed(RESET_LIMITS.verify, parsed.data.email))) {
+    return { error: "Too many attempts. Wait 15 minutes, then try again or request a new code.", values: { email: parsed.data.email } };
+  }
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.verifyOtp({ email: parsed.data.email, token: parsed.data.token, type: "recovery" });

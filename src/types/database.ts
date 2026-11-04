@@ -1592,6 +1592,7 @@ export type Database = {
       admin_update_university: { Args: { p_actor: string | null; p_id: string | null; p_name: string | null; p_short_name: string | null; p_city: string | null }; Returns: undefined };
       admin_user_contact: { Args: { p_actor: string | null; p_user: string | null }; Returns: { email: string | null; email_confirmed_at: string | null; last_sign_in_at: string | null; auth_created_at: string | null }[] };
       admin_write_audit: { Args: { p_actor: string | null; p_action: string | null; p_target_type: string | null; p_target_id: string | null; p_reason?: string | null; p_before?: Json | null; p_after?: Json | null; p_metadata?: Json | null; p_outcome?: string | null }; Returns: string };
+      auth_attempt_allowed: { Args: { p_action: string | null; p_keys: string[] | null; p_limits: number[] | null; p_window: unknown }; Returns: boolean };
       build_prefix_tsquery: { Args: { p_query: string | null }; Returns: unknown };
       can_message: { Args: { p_conversation_id: string | null }; Returns: boolean };
       can_sell: { Args: Record<PropertyKey, never>; Returns: boolean };

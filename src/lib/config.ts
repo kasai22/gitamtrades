@@ -31,5 +31,8 @@ export const features = {
   meetupAreas: false,
 } as const;
 
+/** Must match "Email OTP Length" in Supabase (Authentication → Sign In / Providers → Email). */
+export const EMAIL_OTP_LENGTH = 6;
+
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 export const LISTING_PAGE_SIZE = 24;

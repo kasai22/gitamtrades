@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { FormField, FormMessage, SubmitButton, describedBy } from "@/components/shared/form";
+import { EMAIL_OTP_LENGTH } from "@/lib/config";
 import {
   requestPasswordReset,
   resendVerification,
@@ -15,6 +16,9 @@ import {
   verifyResetCode,
   type AuthFormState,
 } from "../actions";
+
+const OTP_PATTERN = `\\d{${EMAIL_OTP_LENGTH}}`;
+const OTP_PLACEHOLDER = "0".repeat(EMAIL_OTP_LENGTH);
 
 export function SignUpForm({ domains }: { domains: string[] }) {
   const [state, action] = useActionState<AuthFormState, FormData>(signUp, null);
@@ -94,8 +98,8 @@ export function VerifyCodeForm({ email }: { email: string }) {
       <FormField label="Email" htmlFor="verify-email">
         <Input id="verify-email" name="email" type="email" autoComplete="email" required defaultValue={state?.values?.email ?? email} />
       </FormField>
-      <FormField label="Verification code" htmlFor="token" hint="The code is in the same email as the link.">
-        <Input id="token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6,10}" maxLength={10} required className="font-mono tracking-[0.3em]" />
+      <FormField label="Verification code" htmlFor="token" hint={`The ${EMAIL_OTP_LENGTH}-digit code is in the same email as the link.`}>
+        <Input id="token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern={OTP_PATTERN} minLength={EMAIL_OTP_LENGTH} maxLength={EMAIL_OTP_LENGTH} placeholder={OTP_PLACEHOLDER} required className="font-mono tracking-[0.3em]" />
       </FormField>
       <SubmitButton pendingLabel="Verifying…">Verify email</SubmitButton>
     </form>
@@ -130,7 +134,8 @@ export function ForgotPasswordForm() {
     return (
       <div className="grid gap-6">
         <p className="text-sm text-muted-foreground">
-          Enter the code we sent to <strong className="text-foreground">{sentTo}</strong>. It may take a minute to arrive; check spam too.
+          If an account exists for <strong className="text-foreground">{sentTo}</strong>, we&apos;ve sent a reset code to it. It may
+          take a minute to arrive; check spam too.
         </p>
         <ResetCodeForm key={sentTo} email={sentTo} />
         <form action={action} className="grid gap-3 border-t pt-6" noValidate>
@@ -164,7 +169,7 @@ function ResetCodeForm({ email }: { email: string }) {
       <FormMessage error={state?.error} />
       <input type="hidden" name="email" value={email} />
       <FormField label="Reset code" htmlFor="reset-token">
-        <Input id="reset-token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6,10}" maxLength={10} required autoFocus className="font-mono tracking-[0.3em]" />
+        <Input id="reset-token" name="token" inputMode="numeric" autoComplete="one-time-code" pattern={OTP_PATTERN} minLength={EMAIL_OTP_LENGTH} maxLength={EMAIL_OTP_LENGTH} placeholder={OTP_PLACEHOLDER} required autoFocus className="font-mono tracking-[0.3em]" />
       </FormField>
       <SubmitButton size="lg" pendingLabel="Verifying…">Verify code</SubmitButton>
     </form>
