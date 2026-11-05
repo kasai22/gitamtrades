@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProsePage } from "@/components/shared/prose-page";
 import { appConfig } from "@/lib/config";
+import { publicPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Help & FAQ" };
+export const metadata: Metadata = publicPageMetadata("/help", {
+  title: "Help & FAQ",
+  description:
+    "Frequently asked questions about Gitam Marketplace, the free marketplace for GITAM students, plus how reports and reviews work and how to get help.",
+});
 
 const FAQ = [
   ["Who can join?", "Current GITAM students aged 18 or over, using their @student.gitam.edu email. Alumni, staff and personal email addresses can't be used."],

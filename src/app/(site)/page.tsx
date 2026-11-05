@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import {
@@ -29,6 +30,13 @@ import { cn } from "@/lib/utils";
 import { getAccessInfo } from "@/features/account/queries";
 import { getCategories, getSavedListingIds, searchListings } from "@/features/listings/queries";
 import { parseSearchParams } from "@/features/search/params";
+import { publicPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = publicPageMetadata("/", {
+  title: { absolute: "Gitam Marketplace: buy and sell with GITAM students" },
+  description:
+    "Textbooks, cycles, calculators, hostel essentials and more, from fellow GITAM students. Quick to list, easy to find and free to use.",
+});
 
 const STEPS = [
   { icon: BadgeCheck, title: "Join with your university email", body: "Only students with a verified university email can browse, list and chat." },

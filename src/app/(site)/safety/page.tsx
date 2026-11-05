@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProsePage } from "@/components/shared/prose-page";
+import { publicPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Safe meetups" };
+export const metadata: Metadata = publicPageMetadata("/safety", {
+  title: "Safe meetups and payments",
+  description:
+    "How to meet and pay safely when buying or selling with other GITAM students. Every exchange happens in person; the marketplace never handles payments.",
+});
 
 export default function SafetyPage() {
   return (

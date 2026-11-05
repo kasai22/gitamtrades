@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProsePage } from "@/components/shared/prose-page";
 import { appConfig } from "@/lib/config";
+import { publicPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Terms of Use" };
+export const metadata: Metadata = publicPageMetadata("/terms", {
+  title: "Terms of Use",
+  description:
+    "The Terms of Use for Gitam Marketplace, an independent marketplace for verified GITAM students. Students arrange exchanges and payments themselves.",
+});
 
 export default function TermsPage() {
   const name = appConfig.name;

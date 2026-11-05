@@ -3,17 +3,19 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { appConfig } from "@/lib/config";
+import { siteUrl } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: { default: `${appConfig.name} — buy and sell on campus`, template: `%s · ${appConfig.name}` },
   description: appConfig.tagline,
   applicationName: appConfig.name,
-  // Listings are only visible to verified students; keep the app out of search engines.
+  // Listings, chats and accounts are only for verified students, so pages stay out of search
+  // engines by default. Public pages opt back in with publicPageMetadata (src/lib/seo.ts).
   robots: { index: false, follow: false },
 };
 

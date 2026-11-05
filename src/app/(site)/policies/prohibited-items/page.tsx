@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProsePage } from "@/components/shared/prose-page";
+import { publicPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Prohibited and restricted items" };
+export const metadata: Metadata = publicPageMetadata("/policies/prohibited-items", {
+  title: "Prohibited and restricted items",
+  description:
+    "What you can and cannot list on Gitam Marketplace. Automated checks block clear violations before they are published, and students can report listings.",
+});
 
 const PROHIBITED = [
   ["Drugs and controlled substances", "Including cannabis, prescription drugs without a prescription, and drug paraphernalia."],

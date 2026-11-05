@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
+      // The *.vercel.app addresses (production alias and previews) serve a copy of the site;
+      // keep them out of search results so only the custom domain is indexed.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: ".*\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
       // Private, per-user pages must never be stored by shared caches.
       {
         source: "/(account|messages|admin|sell|listings|marketplace|search|categories)/:path*",

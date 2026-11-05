@@ -3,8 +3,13 @@ import Link from "next/link";
 import { Mail, UserRound } from "lucide-react";
 import { ProsePage } from "@/components/shared/prose-page";
 import { appConfig } from "@/lib/config";
+import { publicPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Grievance Redressal" };
+export const metadata: Metadata = publicPageMetadata("/grievance", {
+  title: "Grievance Redressal",
+  description:
+    "How to reach the Gitam Marketplace Grievance Officer with a complaint, under the IT Act 2000, the IT Rules 2021 and the DPDP Act 2023.",
+});
 
 /** ADMIN-04: grievance officer details and process (IT Rules, 2021; DPDP Act, 2023). */
 export default function GrievancePage() {

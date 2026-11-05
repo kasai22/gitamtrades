@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProsePage } from "@/components/shared/prose-page";
 import { appConfig } from "@/lib/config";
+import { publicPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = publicPageMetadata("/privacy", {
+  title: "Privacy Policy",
+  description:
+    "What personal data Gitam Marketplace collects, why we use it, who can see it, how long we keep it and the rights you have over it.",
+});
 
 /** Must match actual data handling in the app (PRD §15 launch checklist). */
 export default function PrivacyPage() {
