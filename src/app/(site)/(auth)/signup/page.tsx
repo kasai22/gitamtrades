@@ -10,7 +10,7 @@ import { publicPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = publicPageMetadata("/signup", {
   title: "Join with your GITAM student email",
   description:
-    "Create a free Gitam Marketplace account with your @student.gitam.edu email to buy, sell and chat with fellow GITAM students.",
+    "Create a free Gitam Marketplace account with your @student.gitam.edu or @gitam.in email to buy, sell and chat with fellow GITAM students.",
 });
 
 export default async function SignUpPage() {

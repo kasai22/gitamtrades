@@ -11,7 +11,7 @@ export const metadata: Metadata = publicPageMetadata("/help", {
 });
 
 const FAQ = [
-  ["Who can join?", "Current GITAM students aged 18 or over, using their @student.gitam.edu email. Alumni, staff and personal email addresses can't be used."],
+  ["Who can join?", "Current GITAM students aged 18 or over, using their @student.gitam.edu or @gitam.in email. Personal email addresses can't be used."],
   ["Does anyone approve my listing?", "No. Listings go live straight after automated checks. Clear rule-breaking is blocked with an explanation, and some listings are checked by the safety team before they're shown."],
   ["How do I get paid?", "In person, when you meet the buyer. The marketplace never collects, holds or transfers money, and messages are not orders."],
   ["Is my phone number visible?", "Only if you share it. The number saved in Settings goes only to people you tap Share contact for in a chat. A number you type into a listing or post is visible to every verified student."],

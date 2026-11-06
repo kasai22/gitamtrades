@@ -2,7 +2,7 @@
 
 A student-only, peer-to-peer marketplace where verified GITAM students buy, sell and pass on items on campus. It's built from [`PRD.md`](PRD.md) (v1.0). The architecture and decisions are in [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md), and per-requirement status is in [`REQUIREMENTS_TRACEABILITY.md`](REQUIREMENTS_TRACEABILITY.md).
 
-- **Students only:** sign-up requires a `@student.gitam.edu` email (no alumni or staff), enforced in the database. Email verification (link or 6-digit code) gates every marketplace feature.
+- **GITAM emails only:** sign-up requires a `@student.gitam.edu` or `@gitam.in` email, enforced in the database. Email verification (link or 6-digit code) gates every marketplace feature.
 - **Publish-first:** listings go live immediately after deterministic automated checks. There is no human approval queue. Clear violations are blocked with a specific reason and a review path, and ambiguous signals are hidden pending review.
 - **Offline settlement:** in-app chat, optional contact sharing to one person, and in-person exchange. The site never collects, holds or transfers payment.
 - **Community:** Reddit-style discussion threads at `/community`. Topic-tagged posts, nested replies (up to 9 levels, collapsible), up/down votes with Hot/New/Top sorting, reports, author deletion ("[deleted]") and a moderation queue at `/admin/community` (remove/restore/lock/pin). Posts and comments go through the same automated text checks, and the database enforces eligibility, rate limits (10 posts/day, 10 comments/minute, 300/day), thread depth and vote integrity.
@@ -12,7 +12,7 @@ A student-only, peer-to-peer marketplace where verified GITAM students buy, sell
 >
 > **Pilot decision:** event-ticket listings **with photos** publish quarantined until a moderator checks the photos for barcodes, QR codes and booking codes (`ticket_photo_review`). Review them in **/admin/listings?state=quarantined&signal=ticket_photo_review**. Text-only ticket listings and all other categories publish immediately.
 >
-> Launch configuration: GITAM (Deemed to be University), allowlisted domain `student.gitam.edu` (migration `20261028000006_gitam_launch.sql`). Sellers choose "Arrange in chat" (no meetup areas for the pilot). Grievance Officer: Dhanush, dhanush@gitam-marketplace.in.
+> Launch configuration: GITAM (Deemed to be University), allowlisted domains `student.gitam.edu` (migration `20261028000006_gitam_launch.sql`) and `gitam.in` (migration `20261106000001_allow_gitam_in.sql`). Sellers choose "Arrange in chat" (no meetup areas for the pilot). Grievance Officer: Dhanush, dhanush@gitam-marketplace.in.
 
 ## Stack
 
@@ -90,7 +90,7 @@ Local emails (the verification link and code) appear in Mailpit at http://127.0.
 
 ### How email verification works
 
-1. Only `@student.gitam.edu` addresses can create an account. A database trigger rejects every other domain, including `gitam.edu` (staff) and personal email, so the rule can't be bypassed by calling the API directly.
+1. Only `@student.gitam.edu` and `@gitam.in` addresses can create an account. A database trigger rejects every other domain, including `gitam.edu` and personal email, so the rule can't be bypassed by calling the API directly.
 2. Supabase Auth emails a verification link **and** a 6-digit code to that address. Until it's confirmed, the account can't sign in, browse, message or sell. Owning a working GITAM student inbox is the proof of eligibility.
 3. The student clicks the link (`/auth/confirm`) or types the code on `/verify-email`. Links and codes expire; "Resend verification email" sends a fresh one.
 

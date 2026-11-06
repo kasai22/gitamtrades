@@ -16,8 +16,17 @@ describe("GITAM launch configuration (migration 0006)", () => {
     expect(row.name).toBe("GITAM (Deemed to be University)");
   });
 
-  it("rejects staff, look-alike and personal domains (no alumni for the pilot)", async () => {
-    for (const email of ["prof@gitam.edu", "old.student@gitam.in", "fake@student.gitam.edu.in", "someone@gmail.com"]) {
+  it("allows @gitam.in addresses (migration 20261106000001)", async () => {
+    const id = await db.createUser({ email: "someone@gitam.in", displayName: "Kiran" });
+    const [row] = await db.admin<{ name: string }>(
+      "select u.name from public.profiles p join public.universities u on u.id = p.university_id where p.id = $1",
+      [id],
+    );
+    expect(row.name).toBe("GITAM (Deemed to be University)");
+  });
+
+  it("rejects staff, look-alike and personal domains", async () => {
+    for (const email of ["prof@gitam.edu", "fake@student.gitam.edu.in", "fake@gitam.in.com", "x@sub.gitam.in", "someone@gmail.com"]) {
       expect(await errorOf(db.createUser({ email })), email).toContain("EMAIL_DOMAIN_NOT_ALLOWED");
     }
   });

@@ -35,7 +35,7 @@ export default function TermsPage() {
       <section>
         <h2>2. Eligibility and accounts</h2>
         <ol>
-          <li>You must be at least 18 years old and a current student with an active <strong>@student.gitam.edu</strong> email address. Alumni, staff and personal email addresses cannot be used.</li>
+          <li>You must be at least 18 years old and a member of the GITAM community with an active <strong>@student.gitam.edu</strong> or <strong>@gitam.in</strong> email address. Personal email addresses cannot be used.</li>
           <li>You must verify your email address before you can browse listings, message other users or sell.</li>
           <li>You may hold only one account. Keep your password confidential; you are responsible for activity on your account.</li>
           <li>&ldquo;University email verified&rdquo; means only that a user controls a GITAM student email address. It is not a verification of identity, character or the items they offer.</li>
